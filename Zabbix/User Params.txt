@@ -1,0 +1,28 @@
+#vWAP GW Template by ZMA
+# Throughput Stats for vWAP
+UserParameter=vwap.server_kbytes_out_5min, squidclient -p 8080 mgr:5min>&1|grep 'server.all.kbytes_out'|cut -d'=' -f2| cut -d'/' -f1
+UserParameter=vwap.server_kbytes_in_5min, squidclient -p 8080 mgr:5min>&1|grep 'server.all.kbytes_in'|cut -d'=' -f2| cut -d'/' -f1
+
+
+#HTTP Stats for vWAP
+UserParameter=vwap.http_requests_5min, squidclient -p 8080 mgr:5min>&1|grep 'client_http.requests'|cut -d'=' -f2| cut -d'/' -f1
+UserParameter=vwap.http_errors_5min, squidclient -p 8080 mgr:5min>&1|grep 'client_http.errors'|cut -d'=' -f2| cut -d'/' -f1
+UserParameter=vwap.total_http_requests_5min,squidclient -p 8080 mgr:info>&1|grep 'HTTP Requests (All):'|cut -d':' -f2 | awk '{print$1}'
+UserParameter=vwap.http_service_time_5min,squidclient -p 8080 mgr:5min >&1 | grep client_http.all_median_svc_time | awk '{print $3}'
+
+#Cache Stats
+#UserParameter=vwap.cache_hits_5min,squidclient -p 8080 mgr:info>&1|grep 'Cache Misses:'|cut -d':' -f2 | awk '{print$1}'
+#UserParameter=vwap.cache_miss_5min,squidclient -p 8080 mgr:info>&1|grep 'Cache Hits:'|cut -d':' -f2 | awk '{print$1}'
+UserParameter=vwap.cache_hits_5min, squidclient -p 8080 mgr:info>&1|grep 'Hits as % of all requests:'|awk -F ':' '{print $3}'|cut -d',' -f1|tr -d '%'
+UserParameter=vwap.disks_hits_5min, squidclient -p 8080 mgr:info>&1|grep 'Disk hits as % of hit requests:'|awk -F ':' '{print $3}'|cut -d',' -f1|tr -d '%'
+UserParameter=vwap.cahce_disk_utilization,du -sh /var/spool/squid>&1|awk '{print $1}'
+
+#vWAP System
+UserParameter=vwap.cpu_usage_5min,squidclient -p 8080 mgr:info>&1|grep 'CPU Usage, 5 minute avg:'|cut -d':' -f2| tr -d ' \t'|tr -d '%'
+UserParameter=vwap.up_time,squidclient -p 8080 mgr:info>&1|grep 'UP Time:'|cut -d':' -f2 | awk '{print$1}'
+UserParameter=vwap.disk_space_30min,df -k | grep root | awk '{print $5}' | cut -d '%' -f1>&1
+UserParameter=vwap.disk_space_home_30min,df -k | grep root | awk '{print $5}' | cut -d '%' -f1>&1
+UserParameter=vwap.ntp_status_30min,ntpstat >&1 | grep "synchronised to NTP server" | wc -l
+
+#Check Squid Process is alive
+UserParameter=vwap.proc_alive,ps -ef | grep "squid" | grep -v grep | wc -l>&1

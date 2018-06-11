@@ -1,0 +1,7 @@
+sudo systemctl start squid
+sudo systemctl start zabbix-agent
+sudo systemctl start ntpd
+ziproxy -d -c /etc/ziproxy.conf
+ps -ef | grep squid
+ps -ef | grep ziproxy
+ps -ef | grep zabbix
